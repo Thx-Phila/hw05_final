@@ -51,7 +51,8 @@ def profile(request, username):
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following': following,}
+        'following': following,
+        }
     return render(request, template, context)
 
 
@@ -113,7 +114,8 @@ def follow_index(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj,}
+        'page_obj': page_obj,
+        }
 
     return render(request, 'posts/follow.html', context)
 
