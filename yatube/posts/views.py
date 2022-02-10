@@ -11,6 +11,7 @@ from yatube.settings import POSTS_QUANTITY
 
 User = get_user_model()
 
+
 def paginate(request, queryset):
     paginator = Paginator(queryset, POSTS_QUANTITY)
     page_number = request.GET.get
@@ -104,12 +105,12 @@ def add_comment(request, post_id):
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
 
+
 @login_required
 def follow_index(request):
     posts = Post.objects.filter(author__following__user=request.user)
     paginator = Paginator(posts, POSTS_QUANTITY)
     page_number = request.GET.get('page')
-
     page_obj = paginator.get_page(page_number)
     context = {
         'page_obj': page_obj,}
