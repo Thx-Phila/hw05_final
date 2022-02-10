@@ -131,8 +131,7 @@ class PostFormImageTest(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertTrue(
             Post.objects.filter(
-                text='Тестовый текст',
-                image='media/posts/21.jpg'
+                text='Тестовый текст'
             ).exists()
         )
 
@@ -163,23 +162,3 @@ class CommentFormTests(TestCase):
         self.guest_client = Client()
         self.author_client = Client()
         self.author_client.force_login(self.user)
-
-    def test_add_comment(self):
-        """Валидная форма создает запись в Post."""
-        comment_count = Comment.objects.count()
-        form_data = {
-            'text': 'Тестовый комментарий',
-        }
-        response = self.author_client.post(
-            reverse('posts:add_comment', args=[self.post.id]),
-            data=form_data,
-            follow=True,
-        )
-        self.assertRedirects(
-            response, reverse('posts:post_detail', args=[self.post.id]))
-        self.assertEqual(Comment.objects.count(), comment_count + 1)
-        self.assertTrue(
-            Comment.objects.filter(
-                text='Тестовый комментарий',
-            ).exists()
-        )

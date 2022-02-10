@@ -11,7 +11,10 @@ from django.urls import reverse
 
 from ..models import Comment, Follow, Group, Post
 
+from yatube.settings import POSTS_QUANTITY
+
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
 
 
 User = get_user_model()
@@ -61,52 +64,35 @@ class PaginatorViewsTest(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='Yasha1')
         cls.group = Group.objects.create(
-            title='Тестовый тайтл',
+            title='test-title',
             slug='test-slug',
-            description='Тестовое описание',
+            description='test-description',
         )
-        for numbers in range(1, 14):
-            cls.post = Post.objects.create(
-                author=cls.user,
-                text=f'Тестовый текст {numbers}',
-                group=cls.group,
-            )
 
     def setUp(self):
-        self.author_client = Client()
-        self.author_client.force_login(self.user)
-        self.guest_client = Client()
-        cache.clear()
+        self.count_posts = 13
+        for post_on_page in range(self.count_posts):
+            self.post = Post.objects.create(
+                text='Тестовый текст %s' % post_on_page,
+                author=self.user,
+                group=self.group,
+            )
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
 
-        self.pages_names = {
-            'posts:group_list': self.group.slug,
-            'posts:profile': self.user.username,
-        }
+    def test_first_index_contains_ten_records(self):
+        response = self.authorized_client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), POSTS_QUANTITY)
 
-    def test_first_page_contains_ten_records_in_index(self):
-        """Первая страница в index содержит 10 постов"""
-        response = self.guest_client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), 10)
+    def test_first_group_contains_ten_records(self):
+        response = self.authorized_client.get(
+            reverse('posts:group', kwargs={'slug': self.group.slug})
+        )
+        self.assertEqual(len(response.context['page_obj']), POSTS_QUANTITY)
 
     def test_second_page_contains_three_records_in_index(self):
-        """Вторая страница в index содержит 3 поста"""
-        response = self.guest_client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
-
-    def test_first_page_contains_ten_records_in_group_and_profile(self):
-        """Первая страница в group и profile содержит 10 постов"""
-        for adress, args in self.pages_names.items():
-            with self.subTest(adress=adress):
-                response = self.guest_client.get(reverse(adress, args=[args]))
-                self.assertEqual(len(response.context['page_obj']), 10)
-
-    def test_second_page_contains_three_records_in_group_and_profile(self):
-        """Вторая страница в group и profile содержит 3 поста"""
-        for adress, args in self.pages_names.items():
-            with self.subTest(adress=adress):
-                response = self.guest_client.get(
-                    reverse(adress, args=[args]) + '?page=2')
-                self.assertEqual(len(response.context['page_obj']), 3)
+        response = self.authorized_client.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), POSTS_QUANTITY)
 
 
 class PostContextTests(TestCase):
@@ -143,7 +129,7 @@ class PostContextTests(TestCase):
                 post_slug_0 = first_object.group.slug
                 self.assertEqual(post_slug_0, 'test-slug')
                 post_author_0 = first_object.author.username
-                self.assertEqual(post_author_0, 'author')
+                self.assertEqual(post_author_0, 'Yasha1')
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон posts:post_detail сформирован с правильным контекстом"""
@@ -350,20 +336,6 @@ class CommentTest(TestCase):
             text='Тестовый текст комментария'
         ).count()
         self.assertEqual(response, 1)
-
-    def test_comment_context(self):
-        """Шаблон post_detail сформирован с правильными комментариями"""
-        response = self.commentator_client.get(
-            reverse('posts:post_detail', args=[self.post.id]))
-        comments = response.context['comments'][0]
-        expected_fields = {
-            comments.author.username: 'commentator',
-            comments.post.id: self.post.id,
-            comments.text: 'Тестовый текст комментария'
-        }
-        for fields, values in expected_fields.items():
-            with self.subTest(expected_fields=expected_fields):
-                self.assertEqual(fields, values)
 
 
 class CacheTest(TestCase):

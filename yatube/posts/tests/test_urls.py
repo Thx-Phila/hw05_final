@@ -78,19 +78,17 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
-        """URL-адресс использует соответствующий шаблон"""
-        cache.clear()
+        """URL-адрес использует соответствующий шаблон,
+        для неавторизованного пользователя"""
         templates_url_names = {
             '/': 'posts/index.html',
-            '/group/testslug/': 'posts/group_list.html',
-            '/profile/author/': 'posts/profile.html',
-            '/posts/1/': 'posts/post_detail.html',
-            '/posts/1/edit/': 'posts/create_post.html',
-            '/create/': 'posts/create_post.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
+            f'/posts/{self.post.pk}/': 'posts/post_detail.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
-                response = self.author_client.get(adress)
+                response = self.client.get(adress)
                 self.assertTemplateUsed(response, template)
 
     def test_add_comment_url_exists_at_desired_location_anonymous(self):
