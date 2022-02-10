@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+  Страница группы {{ group.title }}
+{% endblock %}
+{% block content %} 
+  <div class="container py-5"> 
+    <h1>{{ group }}</h1> 
+    <p> 
+      {{ group.description|linebreaksbr }} 
+    </p> 
+    {% for post in page_obj %} 
+      <article> 
+        {% include 'posts/includes/post.html' %} 
+        <a href="{% url 'posts:post_detail' post.pk %}">Подробная информация</a>
+      </article> 
+      <hr>
+    {% endfor %}
+    {% include 'posts/includes/paginator.html' %}
+  </div> 
+{% endblock %}  
