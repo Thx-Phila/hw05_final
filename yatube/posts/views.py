@@ -24,7 +24,8 @@ def index(request):
     posts = Post.objects.all()
     page_obj = paginate(request, posts)
     context = {
-        'page_obj': page_obj}
+        'page_obj': page_obj
+    }
     return render(request, template, context)
 
 
@@ -35,7 +36,8 @@ def group_posts(request, slug):
     page_obj = paginate(request, posts)
     context = {
         'group': group,
-        'page_obj': page_obj}
+        'page_obj': page_obj
+    }
     return render(request, template, context)
 
 
@@ -51,8 +53,8 @@ def profile(request, username):
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following': following,
-        }
+        'following': following
+    }
     return render(request, template, context)
 
 
@@ -64,7 +66,8 @@ def post_detail(request, post_id):
     context = {
         'post': post,
         'count': count,
-        'form': form}
+        'form': form
+    }
     return render(request, template, context)
 
 
@@ -114,8 +117,8 @@ def follow_index(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj,
-        }
+        'page_obj': page_obj
+    }
 
     return render(request, 'posts/follow.html', context)
 

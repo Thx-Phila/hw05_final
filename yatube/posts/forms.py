@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import ValidationError
 
 from .models import Post, Comment
 
@@ -9,12 +8,6 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ('text', 'group', 'image')
 
-    def clean_text(self):
-        text = self.cleaned_data['text']
-        if text == '':
-            raise ValidationError('Введите текст!')
-        return text
-
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -22,6 +15,7 @@ class CommentForm(forms.ModelForm):
         fields = ('text',)
         widgets = {
             'text': forms.Textarea(),
-            }
+        }
         labels = {
-            'text': 'Текст'}
+            'text': 'Текст'
+        }
