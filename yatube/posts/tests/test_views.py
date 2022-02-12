@@ -151,6 +151,7 @@ class PostContextTests(TestCase):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostImageExistTest(TestCase):
     @classmethod
