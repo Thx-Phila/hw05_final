@@ -56,8 +56,9 @@ class PostURLTests(TestCase):
 
     def test_post_create_url_exists_at_desired_location_anonymous(self):
         """Страница /create/ перенаправит неавторизованного пользователя"""
-        response = self.guest_client.get('/create/', follow=True)
-        self.assertRedirects(response, '/auth/login/?next=/create/')
+        response = self.guest_client.get(reverse('posts:post_create'),
+                                         follow=True)
+        self.assertRedirects(response, ('/auth/login/?next=/create/'))
 
     def test_post_edit_url_exists_at_desired_location_author(self):
         """Страница posts/<int:post_id>/edit видна автору поста"""
@@ -70,17 +71,18 @@ class PostURLTests(TestCase):
         Страница posts/<int:post_id>/edit/ перенаправит
         неавторизованного пользователя
         """
-        response = self.guest_client.get(
-            reverse('posts:post_edit', args=[self.post.id]), follow=True)
-        self.assertRedirects(
-            response, f'/auth/login/?next=/posts/{self.post.id}/edit/')
+        response = self.guest_client.get(reverse('posts:post_edit',
+                                                 kwargs={'post_id':
+                                                         PostURLTests.
+                                                         post.id}))
+        self.assertRedirects(response, '/auth/login/?next=/posts/1/edit/')
 
     def test_unknown_page(self):
         """страница /unknown_page вернет ошибку 404"""
         response = self.guest_client.get('/unknown_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        response = self.authorized_client.get('/unknown_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        response = self.guest_client.get('/unknown_page/')
+        self.assertTemplateUsed(response, 'core/404.html')
 
     def test_urls_uses_correct_template(self):
         """
@@ -103,7 +105,8 @@ class PostURLTests(TestCase):
         Страница posts/<int:post_id>/comment перенаправит
         неавторизованного пользователя
         """
-        response = self.guest_client.get(
-            reverse('posts:add_comment', args=[self.post.id]), follow=True)
-        self.assertRedirects(
-            response, f'/auth/login/?next=/posts/{self.post.id}/comment')
+        response = self.guest_client.get(reverse('posts:add_comment',
+                                                 kwargs={'post_id':
+                                                         PostURLTests.
+                                                         post.id}))
+        self.assertRedirects(response, '/auth/login/?next=/posts/1/comment')

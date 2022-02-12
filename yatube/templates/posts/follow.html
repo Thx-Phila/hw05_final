@@ -9,6 +9,7 @@
   <h1> Публикации избранных авторов </h1>
   {% include 'posts/includes/menu.html' %}
   {% for post in page_obj %}
+  <article>
     <ul>
       <li>
         Автор: {{ post.author.get_full_name }}
@@ -26,6 +27,7 @@
     {% if post.group.slug %}
       <p><a href="{% url 'posts:group_posts' post.group.slug %}">все записи группы</a></p>
     {% endif %}
+  </article>
     {% if not forloop.last %}
       <hr>
     {% endif %}
