@@ -1,15 +1,13 @@
-from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
 
-from .models import Post, Group, Follow
 from .forms import CommentForm, PostForm
+from .models import Follow, Group, Post, User
 
 from yatube.settings import POSTS_QUANTITY
 
-User = get_user_model()
 
 
 def paginate(request, queryset):
@@ -20,13 +18,12 @@ def paginate(request, queryset):
 
 
 def index(request):
-    template = 'posts/index.html'
     posts = Post.objects.all()
     page_obj = paginate(request, posts)
     context = {
         'page_obj': page_obj
     }
-    return render(request, template, context)
+    return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
@@ -61,7 +58,8 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
-    count = post.author.posts.count()
+    post_page = Post.objects.get(pk=post_id)
+    count = Post.objects.filter(author=post_page.author).count()
     form = CommentForm()
     context = {
         'post': post,

@@ -6,6 +6,8 @@ from django.urls import reverse
 from posts.models import Group, Post
 
 User = get_user_model()
+AUTH_EDIT = '/edit/'
+AUTH_COMMENT = '/comment'
 
 
 class PostURLTests(TestCase):
@@ -64,8 +66,10 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_url_exists_at_desired_location_anonymous(self):
-        """Страница posts/<int:post_id>/edit/ перенаправит"""
-        """неавторизованного пользователя"""
+        """
+        Страница posts/<int:post_id>/edit/ перенаправит
+        неавторизованного пользователя
+        """
         response = self.guest_client.get(
             reverse('posts:post_edit', args=[self.post.id]), follow=True)
         self.assertRedirects(
@@ -73,12 +77,16 @@ class PostURLTests(TestCase):
 
     def test_unknown_page(self):
         """страница /unknown_page вернет ошибку 404"""
-        response = self.guest_client.get('/unknown_page')
+        response = self.guest_client.get('/unknown_page/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        response = self.authorized_client.get('/unknown_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон,
-        для неавторизованного пользователя"""
+        """
+        URL-адрес использует соответствующий шаблон,
+        для неавторизованного пользователя
+        """
         templates_url_names = {
             '/': 'posts/index.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
@@ -91,8 +99,10 @@ class PostURLTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_add_comment_url_exists_at_desired_location_anonymous(self):
-        """Страница posts/<int:post_id>/comment перенаправит"""
-        """неавторизованного пользователя"""
+        """
+        Страница posts/<int:post_id>/comment перенаправит
+        неавторизованного пользователя
+        """
         response = self.guest_client.get(
             reverse('posts:add_comment', args=[self.post.id]), follow=True)
         self.assertRedirects(

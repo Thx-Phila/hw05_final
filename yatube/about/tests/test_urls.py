@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
@@ -12,7 +13,7 @@ class TestAboutAvailable(TestCase):
         url_names = ['/about/author/', '/about/tech/']
         for url in url_names:
             response = self.guest_client.get(url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
 class TestAboutUrls(TestCase):
