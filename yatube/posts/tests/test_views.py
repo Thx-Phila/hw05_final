@@ -151,20 +151,6 @@ class PostContextTests(TestCase):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
 
-    def test_edit_post_show_correct_context(self):
-        """Шаблон post:post_edit сформирован с правильным контекстом"""
-        response = self.author_client.get(reverse('posts:post_edit',
-                                          args=[self.post.id]))
-        form_fields = {
-            'text': forms.fields.CharField,
-            'group': forms.fields.ChoiceField,
-        }
-
-        for value, expected in form_fields.items():
-            with self.subTest(value=value):
-                form_field = response.context.get('form').fields.get(value)
-                self.assertIsInstance(form_field, expected)
-
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostImageExistTest(TestCase):
