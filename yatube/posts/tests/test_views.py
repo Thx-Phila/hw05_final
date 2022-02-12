@@ -154,7 +154,7 @@ class PostContextTests(TestCase):
     def test_edit_post_show_correct_context(self):
         """Шаблон post:post_edit сформирован с правильным контекстом"""
         response = self.author_client.get(reverse('posts:post_edit',
-                args=[self.post.id]))
+                                          args=[self.post.id]))
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
