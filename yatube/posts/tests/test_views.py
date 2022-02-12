@@ -40,16 +40,16 @@ class PostPagesTests(TestCase):
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
+        cache.clear()
         templates_pages_names = {
-            reverse('posts:group',
-                    args=[self.group.slug]): 'posts/group_list.html',
-            reverse('posts:profile',
-                    args=[self.user.username]): 'posts/profile.html',
-            reverse('posts:post_detail',
-                    args=[self.post.id]): 'posts/post_detail.html',
+            reverse('posts:index'): 'posts/index.html',
+            reverse('posts:group', args=[self.group.slug]):
+            'posts/group_list.html',
+            reverse('posts:profile', args=[self.user.username]):
+            'posts/profile.html',
+            reverse('posts:post_detail', args=[self.post.id]):
+            'posts/post_detail.html',
             reverse('posts:post_create'): 'posts/create_post.html',
-            reverse('posts:post_edit',
-                    args=[self.post.id]): 'posts/create_post.html',
         }
         for reverse_name, template in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
@@ -153,18 +153,17 @@ class PostContextTests(TestCase):
 
     def test_edit_post_show_correct_context(self):
         """Шаблон post:post_edit сформирован с правильным контекстом"""
-        response = self.author_client.get(
-            reverse('posts:post_edit', args=[self.post.id]))
+        response = self.author_client.get(reverse('posts:post_edit',
+                                           args=[self.post.id]))
         form_fields = {
             'text': forms.fields.CharField,
-            'group': forms.models.ModelChoiceField,
+            'group': forms.fields.ChoiceField,
         }
+
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
-                is_edit_field = response.context.get('is_edit')
                 self.assertIsInstance(form_field, expected)
-                self.assertEqual(is_edit_field, True)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)

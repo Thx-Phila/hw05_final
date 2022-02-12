@@ -6,8 +6,6 @@ from django.urls import reverse
 from posts.models import Group, Post
 
 User = get_user_model()
-AUTH_EDIT = '/edit/'
-AUTH_COMMENT = '/comment'
 
 
 class PostURLTests(TestCase):
@@ -58,13 +56,14 @@ class PostURLTests(TestCase):
         """Страница /create/ перенаправит неавторизованного пользователя"""
         response = self.guest_client.get(reverse('posts:post_create'),
                                          follow=True)
-        self.assertRedirects(response, ('/auth/login/?next=/create/'))
+        self.assertRedirects(response, f'{reverse("users:login")}?next=/create/')
 
     def test_post_edit_url_exists_at_desired_location_author(self):
         """Страница posts/<int:post_id>/edit видна автору поста"""
-        response = self.author_client.get(
-            reverse('posts:post_edit', args=[self.post.id]))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        adress = reverse('posts:post_edit', args=[self.post.id])
+        response = self.authorized_client.get(adress)
+        self.assertRedirects(
+            response, reverse('posts:post_detail', args=[self.post.id]))
 
     def test_post_edit_url_exists_at_desired_location_anonymous(self):
         """
@@ -75,7 +74,7 @@ class PostURLTests(TestCase):
                                                  kwargs={'post_id':
                                                          PostURLTests.
                                                          post.id}))
-        self.assertRedirects(response, '/auth/login/?next=/posts/1/edit/')
+        self.assertRedirects(response, f'{reverse("users:login")}?next=/posts/1/edit/')
 
     def test_unknown_page(self):
         """страница /unknown_page вернет ошибку 404"""
@@ -109,4 +108,4 @@ class PostURLTests(TestCase):
                                                  kwargs={'post_id':
                                                          PostURLTests.
                                                          post.id}))
-        self.assertRedirects(response, '/auth/login/?next=/posts/1/comment')
+        self.assertRedirects(response, f'{reverse("users:login")}?next=/posts/1/comment')
