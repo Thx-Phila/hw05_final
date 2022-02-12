@@ -56,7 +56,8 @@ class PostURLTests(TestCase):
         """Страница /create/ перенаправит неавторизованного пользователя"""
         response = self.guest_client.get(reverse('posts:post_create'),
                                          follow=True)
-        self.assertRedirects(response, f'{reverse("users:login")}?next=/create/')
+        self.assertRedirects(
+            response, f'{reverse("users:login")}?next=/create/')
 
     def test_post_edit_url_exists_at_desired_location_author(self):
         """Страница posts/<int:post_id>/edit видна автору поста"""
@@ -74,7 +75,8 @@ class PostURLTests(TestCase):
                                                  kwargs={'post_id':
                                                          PostURLTests.
                                                          post.id}))
-        self.assertRedirects(response, f'{reverse("users:login")}?next=/posts/1/edit/')
+        self.assertRedirects(
+            response, f'{reverse("users:login")}?next=/posts/1/edit/')
 
     def test_unknown_page(self):
         """страница /unknown_page вернет ошибку 404"""
@@ -108,4 +110,5 @@ class PostURLTests(TestCase):
                                                  kwargs={'post_id':
                                                          PostURLTests.
                                                          post.id}))
-        self.assertRedirects(response, f'{reverse("users:login")}?next=/posts/1/comment')
+        self.assertRedirects(
+            response, f'{reverse("users:login")}?next=/posts/1/comment')
